@@ -1,2 +1,2 @@
-# bookVueFirebase
+# DigitalBook Vue+Firebase
 Vue + Firebase
