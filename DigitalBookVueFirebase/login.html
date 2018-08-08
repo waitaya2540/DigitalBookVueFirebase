@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>ลงชื่อเข้าใช้งาน</title>
+    <!-- Bulma -->
+        <link rel="stylesheet" href="Vendor/bulma-0.7.1/css/bulma.min.css">
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <!-- font-awesome -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- development version, includes helpful console warnings -->
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    
+    <!-- Froala wysiwyg-editor -->
+        <!-- Include external CSS. -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.25.0/codemirror.min.css">
+    
+        <!-- Include Editor style. -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/froala-editor/2.8.4/css/froala_editor.pkgd.min.css" rel="stylesheet" type="text/css" />
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/froala-editor/2.8.4/css/froala_style.min.css" rel="stylesheet" type="text/css" />
+    <!-- END Froala wysiwyg-editor -->
+
+    <!-- CKEditor -->
+        <!-- <script src="https://cdn.ckeditor.com/ckeditor5/10.1.0/classic/ckeditor.js"></script> -->
+
+</head>
+<body>
+
+<!-- ฺBODY -->
+
+<div class="container mt-5 mb-5">
+  <form>
+    <div class="text-center mb-4 border border-warning shadow-lg p-3 mb-3 bg-white rounded">
+      <img class="mb-4" src="Images/desktop.png" alt="" width="150" height="150"><br/>
+      <img id="icon-user-login" class="mb-2" src="Images/user.png" alt="user" width="40" height="40"> <strong id="headerBook">ลงชื่อเข้าใช้งาน</strong>
+      <p>Digital Book Login by Email/Password Authentication<code>:คำเตือน</code> <a href="#KU-CSC-Computer-Engineer-E71">สามารถทำงานได้บน Google Chrome เท่านั้นนาจา</a></p>
+    </div>
+
+    <!-- Alert Wrong Password And Email -->
+    <div id="wrong-password-alert" style="display: none;" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>รหัสผ่านหรืออีเมล์ไม่ถูกต้อง!</strong> กรุณากรอกอีเมล์และรหัสผ่านใหม่อีกครั้ง.
+    </div>
+
+    <!-- LOGIN -->
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <label class="input-group-text" for="inputEmail" id="labelEmail"><img src="Images/email.png" alt="email"></label>
+        </div>
+          <input type="text" id="inputEmail" class="form-control" placeholder="Email address" required>
+      </div>
+
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <label class="input-group-text" for="inputPassword" id="labelPassword"><img src="Images/password.png" alt="password"></label>
+        </div>
+          <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+      </div>
+    <!-- END LOGIN -->
+
+
+    <div class="checkbox mb-3">
+      <!-- <label>
+        <input type="checkbox" value="remember-me"> Remember me
+      </label> -->
+    </div>
+    <button class="btn btn-primary" id="quickstart-sign-in" name="signin" onclick="toggleSignIn()">เข้าสู่ระบบ</button>
+    <!-- <button class="btn btn-success" id="quickstart-sign-up" name="signup" onclick="handleSignUp()">Sign up</button> -->
+    <!-- Register trigger modal -->
+    <button type="button" id="registerBtn" class="btn btn-success" data-toggle="modal" data-target="#registerModal">
+      สมัครสมาชิก
+    </button>
+    <button style="display: none;" class="btn btn-danger" id="quickstart-verify-email" name="verify-email" onclick="sendEmailVerification()">โปรดตรวจสอบยืนยันข้อมูลของคุณ</button>
+    <!-- Send Password Reset Button trigger modal -->
+    <button id="resetPasswordBtn" type="button" class="btn btn-secondary" data-toggle="modal" data-target="#resetPassword">
+      ลืมรหัสผ่าน
+    </button>
+    <!-- <p class="mt-5 mb-3 text-muted text-center">&copy; 2017-2018</p> -->
+  </form>
+
+  <!-- Vue Form -->
+
+  <div style="display: none;" id="comment" class="container mb-5 mt-5">
+      <!-- Create Book -->
+      <form @submit.prevent="storeBook" id="storeBook" style="display: ;" class="p-3">
+          <label for=""><img src="Images/notebook.png" alt="notebook"> สร้างหนังสือ: </label>
+          <input type="text" class="form-control" v-model="titleBook">
+          <button type="submit" class="btn btn-outline-warning btn-lg mb-3 mt-3"><img class="mb-1" src="Images/create.png" alt="create"></button>
+      </form>
+      <h1 class="shadow-none p-3 mb-1 bg-light rounded">Digital BOOK</h1>
+      <div style="display: none;" id="formInsert" v-if="!editText" class="mb-3">
+          <!-- <h4>Post</h4> -->
+          <!-- Create Description -->
+          <form @submit.prevent="storeMessage">
+              <!-- หัวข้อเรื่อง -->
+              <label for="">ชื่อเรื่อง: </label>
+              <input type="text" class="form-control" v-model="userName">
+              <!-- รายละเอียดโพสต์ -->
+              <div>
+                  <label for="">รายละเอียด: </label>
+                  <textarea name="Message" class="form-control" v-model="messageText"></textarea>
+              </div>
+              <!-- อัพโหลดรูป -->
+              <label for="" class="mt-2">อัพโหลดรูปภาพ: </label>
+              <!-- <input type="file" class="form-control-file mb-3" name="fileButton" id="fileButton"> -->
+              <input class="form-control-file mb-3" accept="Pictures/*" type="file" name="fileButton" id="fileButton" value="upload">
+              <div class="progress">
+                  <div class="progress-bar progress-bar-striped progress-bar-animated" id="uploader" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+              </div>
+              <!-- ตั้งส่วนตัว/สาธารณะ -->
+              <div>
+                <label for="">Private: </label>
+                <input type="checkbox" id="public" value="private" v-model="checkedPrivate">
+                <br>
+                <!-- <span>Checked names: {{ checkedPrivate }}</span> -->
+              </div>
+              <button type="submit" class="btn btn-primary mt-2">บันทึก</button>
+          </form>
+      </div>
+
+        <!-- Nav Pills -->
+        <center>
+          <ul class="nav nav-pills justify-content-center shadow p-3 mb-4 bg-white rounded" id="pills-tab" role="tablist">
+            <li class="nav-item">
+              <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab" aria-controls="pills-home" aria-selected="true">โพสต์ส่วนตัว</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="pills-profile-tab" data-toggle="pill" href="#pills-profile" role="tab" aria-controls="pills-profile" aria-selected="false">โพสต์ทั้งหมด</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="pills-contact-tab" data-toggle="pill" href="#pills-contact" role="tab" aria-controls="pills-contact" aria-selected="false">ติดตาม</a>
+            </li>
+          </ul>
+          <div class="tab-content" id="pills-tabContent">
+            <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+
+              <!-- Private Query -->
+              <button class="btn btn-secondary btn-lg mb-3" style="display: none;" id="backTotitle" v-on:click="backTotitle">กลับ</button>
+              <div id="titleBookMessageQuery">
+                <div class="alert alert-info shadow-sm p-3 mb-3 bg-white rounded" role="alert" v-for="messageTitle of messagesTitle" v-if="messageTitle.userEmail === userLog">
+                  <h6 v-on:click="setValueTitleBookMessage(messageTitle)">
+                    <strong class="mx-2 text-info"><a>{{messageTitle.TitleBook}}</a></strong>
+                  </h6>
+                  <span class="badge badge-secondary" v-on:click="setValueTitleBookMessage(messageTitle)">{{messageTitle.TimeCreate}}</span>
+                  <a href="#" class="badge badge-danger" @click.prevent="deleteBook(messageTitle)">ลบ</a>
+                </div>
+              </div>
+
+              <!-- <h3 class="alert alert-info"><strong>ส่วนตัว</strong></h3> -->
+                <div class="card w-75 mb-3 justify-content-center" v-for="message of messages" v-if="message.userEmail === userLog && titleBookMessage == message.book">
+                  <div class="card-body">
+                      <h2 class="card-title" class="mt-1">{{message.name}}</h2>
+                      <img :src="message.img" :alt="message.img" class="mb-2"/>
+                      <p class="card-text" v-if="message != editText">{{message.text}}</p>
+                      <textarea name="Message" class="form-control" v-model="messageText" v-else></textarea>
+
+                        <p class="card-text" v-if="message != editText"><img src="Images/visible-opened-eye-interface-option.png" alt="visible"> การตั้งค่า: <a class="badge badge-success text-light" v-if="message.checkedPrivate == false">สาธารณะ</a><a class="badge badge-danger text-light" v-if="message.checkedPrivate == true">ส่วนตัว</a></p>
+                        <div v-else>
+                          <label for="">Private:</label>
+                          <input type="checkbox" id="public" value="public" v-model="checkedPrivate">
+                        </div>
+
+                        <div class="shadow-sm p-3 mb-3 text-warning rounded text-monospace"><img src="Images/clock.png" alt="clock" class="mb-1"> {{message.createAt}}</div>
+
+                      <div v-if="message != editText">
+                          <a href="#" class="btn btn-outline-danger btn-sm" @click.prevent="deleteMessage(message)">ลบ</a>
+                          <a href="#" class="btn btn-outline-warning btn-sm" @click.prevent="editMessage(message)">แก้ไข</a>        
+                      </div>
+                      <div v-else>
+                          <a href="#" class="btn btn-outline-primary btn-sm" @click.prevent="updateMessage()">อัพเดท</a>
+                          <a href="#" class="btn btn-outline-light btn-sm text-secondary" @click.prevent="cancelMessage()">ยกเลิก</a>
+                      </div>
+                  </div>
+                </div>
+              <div v-else></div>
+              <div v-if="titleBookMessage === ''"></div>
+              <!-- END Private Query -->
+
+            </div>
+
+            <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
+            
+              <!-- Public Query -->
+              <!-- <h3 class="alert alert-success"><strong>สาธารณะ</strong></h3> -->
+              <div class="card w-75 mb-3 mt-2 justify-content-center" v-for="message of messages" v-if="message.checkedPrivate == false && message.userEmail !== userLog">
+                <div class="card-body">
+                  <h2 class="card-title mt-1 display-4">{{message.name}}</h2>
+                  <img :src="message.img" :alt="message.img" style="max-height: 1000px;" class="mb-2" />
+                  <p class="card-text">{{message.text}}</p>
+                  <p class="card-text"><img src="Images/visible-opened-eye-interface-option.png" alt="visible"> การตั้งค่า: <a class="badge badge-success text-light" v-if="message.checkedPrivate == false">สาธารณะ</a><a class="badge badge-danger text-light" v-if="message.checkedPrivate == true">ส่วนตัว</a></p>
+                  
+                  <div class="badge badge-danger">โพสต์โดย: {{message.userEmail}}</div>
+                  <div class="shadow-sm p-3 mb-3 text-warning rounded text-monospace"><img src="Images/clock.png" alt="clock" class="mb-1"> {{message.createAt}}</div>
+                  
+                  <button type="button" class="btn btn-link float-right" v-if="message.follow == 0" @click.prevent="followBook(message)"><img src="Images/unfollow.png" width="40" height="40" alt="unfollow"></button>
+                  <button type="button" class="btn btn-link float-right" v-if="message.follow == 1" @click.prevent="followBook(message)"><img src="Images/follow.png" width="40" height="40" alt="follow"></button>
+
+                </div>
+              </div>
+              <!-- END Public Query -->
+
+            </div>
+
+            <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">
+
+              <!-- Following Query -->
+              <!-- <h3 class="alert alert-dark"><strong>Following</strong></h3> -->
+              <div class="card w-75 mb-3 mt-2 justify-content-center" v-for="message of messages" v-if="message.follow == 1 && message.userEmail !== userLog">
+                <div class="card-body">
+                  <h2 class="card-title mt-1">{{message.name}}</h2>
+                  <img :src="message.img" :alt="message.img" class="mb-2" />
+                  <p class="card-text text-monospace">{{message.text}}</p>
+                  <p class="card-text"><img src="Images/visible-opened-eye-interface-option.png" alt="visible"> การตั้งค่า: <a class="badge badge-success text-light" v-if="message.checkedPrivate == false">สาธารณะ</a><a class="badge badge-danger text-light" v-if="message.checkedPrivate == true">ส่วนตัว</a></p>
+                  
+                  <div class="badge badge-danger">โพสต์โดย: {{message.userEmail}}</div>
+                  <div class="shadow-sm p-3 mb-3 bg-white rounded text-warning text-monospace"><img src="Images/clock.png" alt="clock" class="mb-1"> {{message.createAt}}</div>
+                  
+                  <button type="button" class="btn btn-link float-right" v-if="message.follow == 1" @click.prevent="followBook(message)"><img src="Images/follow.png" width="40" height="40" alt="unfollow"></button>
+                </div>
+              </div>
+              <!-- END Following Query -->
+
+            </div>
+
+          </div>
+        </center>
+        <!-- END Nav Pills -->
+
+  </div>
+
+  <!-- END Vue Form -->
+
+  <!-- <div class="quickstart-user-details-container">
+    Firebase Sign-In Status: <span id="quickstart-sign-in-status">Unknow</span>
+    <div>Firebase auth <code>currentUser</code> object value:</div>
+    <pre><code id="quickstart-account-details">null</code></pre>
+  </div> -->
+
+</div>
+
+<!-- Send Password Reset modal -->
+<div class="modal fade" id="resetPassword" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Send Password Reset Email</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+      <input type="text" id="inputEmailReset" class="form-control mb-2 mt-3" placeholder="Email address">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button class="btn btn-primary" id="quickstart-password-reset" name="verify-email" onclick="sendPasswordReset()">Send Password Reset Email</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Register Modal -->
+<div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Register</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <label for="">Email</label><br/>
+        <input class="form-control" type="text" id="inputEmailReg" name="inputEmailReg" placeholder="Email"/><br/>
+        <label for="">Password</label><br/>
+        <input class="form-control" type="password" id="inputPasswordReg" name="inputPasswordReg" placeholder="Password"/><br/>
+        <div class="modal-footer">
+          <button class="btn btn-success" id="quickstart-sign-up" name="signup" onclick="handleSignUp()" type="button" data-dismiss="modal" aria-label="Close">สมัครสมาชิก</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- END Register Modal -->
+
+<!-- END BODY -->
+
+<!-- include script -->
+
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/5.2.0/firebase.js"></script>
+
+  <!-- Froala -->
+    <!-- Include external JS libs. -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.25.0/codemirror.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.25.0/mode/xml/xml.min.js"></script>
+
+    <!-- Include Editor JS files. -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/froala-editor/2.8.4/js/froala_editor.pkgd.min.js"></script>
+  <!-- END Froala -->
+
+  <script>
+    // Initialize Firebase
+    var config = {
+      apiKey: "...",
+      authDomain: "...",
+      databaseURL: "...",
+      projectId: "...",
+      storageBucket: "...",
+      messagingSenderId: "..."
+    };
+    firebase.initializeApp(config);
+  </script>
+  </script>
+
+<!-- END include script -->
+
+<!-- Javascript -->
+<script type="text/javascript">
+    // ตรวจสอบการ Log In
+    function toggleSignIn() {
+      if (firebase.auth().currentUser) {
+        // [START signout]
+        firebase.auth().signOut();
+        location.reload();
+        // [END signout]
+      } else {
+        var email = document.getElementById('inputEmail').value;
+        var password = document.getElementById('inputPassword').value;
+        if (email.length < 0) {
+          return;
+        }
+        if (password.length < 0) {
+          return;
+        }
+        // Sign in with email and pass.
+        // [START authwithemail]
+        firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
+          // Handle Errors here.
+          var errorCode = error.code;
+          var errorMessage = error.message;
+          // [START_EXCLUDE]
+          if (errorCode === 'auth/wrong-password') {
+            document.getElementById('wrong-password-alert').style.display = '';
+          } else {
+            document.getElementById('wrong-password-alert').style.display = '';
+            // alert('รหัสผ่านไม่ถูกต้อง');
+            // alert(errorMessage);
+          }
+          console.log(error);
+          document.getElementById('quickstart-sign-in').disabled = false;
+          // [END_EXCLUDE]
+        });
+        // [END authwithemail]
+      }
+      
+      document.getElementById('quickstart-sign-in').disabled = true;
+    }
+    //สร้างบัญชีเข้าใช้งาน
+    function handleSignUp(){
+        var emailReg = document.getElementById("inputEmailReg").value;
+        var passwordReg = document.getElementById("inputPasswordReg").value;
+        console.log(emailReg);
+        if(emailReg.length < 4){
+          alert('อีเมล์ต้องมากกว่า 4 ตัวอักษร');
+          return;
+        }
+        if(passwordReg.length < 8){
+          alert('รหัสผ่านต้องมากกว่า 8 ตัวอักษร');
+          return;
+        }
+        firebase.auth().createUserWithEmailAndPassword(emailReg, passwordReg).catch(function(error) {
+          // Handle Errors here.
+          var errorCode = error.code;
+          var errorMessage = error.message;
+          if(errorCode == 'auth/weak-password'){
+            alert('รหัสผ่านของท่านเดาง่ายเกินไป');
+          }else{
+            alert(errorMessage);
+          }
+          console.log(error);
+        });
+    }
+    //ยืนยันอีเมล
+    function sendEmailVerification() {
+      // [START sendemailverification]
+      firebase.auth().currentUser.sendEmailVerification().then(function() {
+        // Email Verification sent!
+        // [START_EXCLUDE]
+        alert('ส่งอีเมล์ยืนยันตัวตนให้กับอีกเมล์นี้เรียบร้อยแล้ว');
+        // [END_EXCLUDE]
+      });
+      // [END sendemailverification]
+    }
+    //รีเซตรหัสผ่าน
+    function sendPasswordReset() {
+      var email = document.getElementById('inputEmailReset').value;
+      // [START sendpasswordemail]
+      firebase.auth().sendPasswordResetEmail(email).then(function() {
+        // Password Reset Email Sent!
+        // [START_EXCLUDE]
+        alert('สามารถรีเซ็ตรหัสผ่านได้ตามอีเมล์ที่ท่านระบุ');
+        // [END_EXCLUDE]
+      }).catch(function(error) {
+        // Handle Errors here.
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        // [START_EXCLUDE]
+        if (errorCode == 'auth/invalid-email') {
+          alert('อีเมล์ของท่านไม่สามารถใช้งานได้ในขณะนี้');
+          // alert(errorMessage);
+        } else if (errorCode == 'auth/user-not-found') {
+          alert('อีเมล์ของท่านไม่มีอยู่ในระบบ');
+          // alert(errorMessage);
+        }
+        console.log(error);
+        // [END_EXCLUDE]
+      });
+      // [END sendpasswordemail];
+    }
+    //โชว์สถานะของผู้Log In
+    function initApp() {
+      // Listening for auth state changes.
+      // [START authstatelistener]
+      firebase.auth().onAuthStateChanged(function(user) {
+        // [START_EXCLUDE silent]
+        // document.getElementById('quickstart-verify-email').disabled = true;
+        // [END_EXCLUDE]
+        if (user) {
+          // User is signed in.
+          var displayName = user.displayName;
+          var email = user.email;
+          var emailVerified = user.emailVerified;
+          var photoURL = user.photoURL;
+          var isAnonymous = user.isAnonymous;
+          var uid = user.uid;
+          var providerData = user.providerData;
+          // [START_EXCLUDE]
+
+          // Vue ON
+          document.getElementById('comment').style.display = 'inline';
+
+          document.getElementById('inputEmail').value = '';
+          document.getElementById('inputPassword').value = '';
+          
+          document.getElementById('labelEmail').style.display = 'none';
+          document.getElementById('labelPassword').style.display = 'none';
+          document.getElementById('inputEmail').style.display = 'none';
+          document.getElementById('inputPassword').style.display = 'none';
+          document.getElementById('registerBtn').style.display = 'none';
+          document.getElementById('resetPasswordBtn').style.display = 'none';
+          document.getElementById('wrong-password-alert').style.display = 'none';
+
+          document.title = "Digital BOOK";
+
+
+          // document.getElementById('quickstart-sign-in-status').textContent = 'Signed in';
+          document.getElementById('quickstart-sign-in').textContent = 'ออกจากระบบ';
+          document.getElementById('quickstart-sign-in').disabled = false;
+          // document.getElementById('quickstart-account-details').textContent = JSON.stringify(user, null, '  ');
+
+          //Icon User Login
+          document.getElementById('headerBook').textContent = user.email;
+
+          // +++Vue+++
+          // manage database
+          const database = firebase.database();
+          const messageRefTitle = database.ref("TestTitle");
+          const messageRef = database.ref("message");
+
+              new Vue({
+                  el:"#comment",
+                  data:{
+                      messageText:'',
+                      messages:[],
+                      messagesTitle:[],
+                      userName: '',
+                      editText:null,
+                      userEmail: '',
+                      userLog: '',
+                      checkedPrivate: '',
+                      checkedPriveORPublic:null,
+                      checkFollowToggle: null,
+                      time_at: '',
+                      countPost: 0,
+                      titleBook:'',
+                      titleBookMessage: ''
+                  },
+                  methods:{
+                    storeMessage:function(){
+                        if(this.userName === ''){
+                          alert('กรุณาใส่ชื่อเรื่อง');
+                          return;
+                        }
+                        if(this.messageText ===''){
+                          alert('กรุณากรอกรายละเอียด');
+                          return;
+                        }
+                        if(this.titleBookMessage !== ''){
+
+                          // ประกาศตัวแปลไว้ใช้งานในฟังก์ชั่น
+                          var GetTitleBookMessage = this.titleBookMessage;
+                          var GetUserName = this.userName;
+                          var GetMessageText = this.messageText;
+                          var GetUserEmail = user.email;
+                          var GetCheckedPrivate = this.checkedPrivate;
+
+                          //อัพโหลดรูปภาพ
+                          const uploader = document.getElementById('uploader');
+
+                          const fileImg = document.getElementById('fileButton').files[0];
+                          const fileButton = document.getElementById('fileButton').files[0].name;
+
+                          console.log('Filebutton: ' + document.getElementById('fileButton').files[0].name);
+
+                          var datetimeImg = Date.now();
+                          var nameImg = datetimeImg + "_" + fileButton;
+                          var storageRef = firebase.storage().ref("Pictures/" + nameImg);
+                          var task = storageRef.put(fileImg);
+                          task.on('state_changed',
+                            function progress(snapshot){
+                              let percentage = (snapshot.bytesTransferred / snapshot.totalBytes) *100;
+                              uploader.style.width = percentage + '%';
+                              
+                              var result = Math.round(percentage*100)/100;
+                              uploader.textContent = result + '%';
+                            },
+                            function error(err){
+                              console.log(err);
+                            },
+                            function complete(){
+                              console.log('complete upload');
+                              document.getElementById('uploader').style.width = 0 + '%';
+                              document.getElementById('uploader').textContent = '';
+                              document.getElementById('fileButton').value = null;
+                              task.snapshot.ref.getDownloadURL().then(function(downloadURL) {
+                                console.log('File available at', downloadURL);
+                                var messageRef = database.ref("message");
+
+                                console.log(GetTitleBookMessage);
+                                
+                                //เวลาปัจจุบัน
+                                var currentdate = new Date();
+                                var datetime = currentdate.getDate() + "/"
+                                              + (currentdate.getMonth()+1)  + "/" 
+                                              + currentdate.getFullYear() + " @ "  
+                                              + currentdate.getHours() + ":"  
+                                              + currentdate.getMinutes() + ":" 
+                                              + currentdate.getSeconds();
+
+                                  //เพิ่มข้อมูล
+                                  messageRef.push({
+                                      book:GetTitleBookMessage,
+                                      name:GetUserName,
+                                      text:GetMessageText,
+                                      userEmail:GetUserEmail,
+                                      checkedPrivate:GetCheckedPrivate,
+                                      follow:0,
+                                      createAt:datetime,
+                                      img:downloadURL
+                                  })
+                              });
+                            }
+                          );
+
+                          //เวลาปัจจุบัน
+                          // var currentdate = new Date();
+                          // var datetime = "โพสต์เมื่อ: " + currentdate.getDate() + "/"
+                          //               + (currentdate.getMonth()+1)  + "/" 
+                          //               + currentdate.getFullYear() + " @ "  
+                          //               + currentdate.getHours() + ":"  
+                          //               + currentdate.getMinutes() + ":" 
+                          //               + currentdate.getSeconds();
+                          // this.time_at = datetime;
+
+                            //เพิ่มข้อมูล
+                            // messageRef.push({
+                            //     book:this.titleBookMessage,
+                            //     name:this.userName,
+                            //     text:this.messageText,
+                            //     userEmail:user.email,
+                            //     checkedPrivate:this.checkedPrivate,
+                            //     follow:0,
+                            //     createAt:this.time_at,
+                            //     img:nameImg
+                            // })
+                            // this.userName=''
+                            // this.messageText=''
+                            // this.time_at=''
+                            
+                        }
+                      },
+                      storeBook:function(){
+                        if(this.titleBook === ''){
+                          alert('กรุณาใส่ชื่อหนังสือของท่าน');
+                          return;
+                        }
+                        //เวลาปัจจุบัน
+                        var currentdate = new Date();
+                          var datetime = "สร้างเมื่อวันที่: " + currentdate.getDate() + "/"
+                                        + (currentdate.getMonth()+1)  + "/" 
+                                        + currentdate.getFullYear() + " @ "  
+                                        + currentdate.getHours() + ":"  
+                                        + currentdate.getMinutes() + ":" 
+                                        + currentdate.getSeconds();
+                          this.time_at = datetime;
+                        //เพื่มBOOK
+                        messageRefTitle.push({
+                            TitleBook:this.titleBook,
+                            TimeCreate:this.time_at,
+                            userEmail:user.email
+                        })
+                        this.titleBook=''
+                        this.time_at=''
+                      },
+                      setValueTitleBookMessage:function(messageTitle){
+                        //กำหนดค่าให้กับ titleBookMessage เมื่อกดคลิก
+                        this.titleBookMessage = messageTitle.TitleBook
+                        console.log(this.titleBookMessage);
+                        document.getElementById('formInsert').style.display = 'inline';
+                        document.getElementById('titleBookMessageQuery').style.display = 'none';
+                        document.getElementById('storeBook').style.display = 'none';
+                        document.getElementById('backTotitle').style.display = 'inline';
+                      },
+                      backTotitle:function(){
+                        //ปุ่มกลับ
+                        document.getElementById('storeBook').style.display = 'inline';
+                        document.getElementById('formInsert').style.display = 'none';
+                        document.getElementById('titleBookMessageQuery').style.display = 'inline';
+                        document.getElementById('backTotitle').style.display = 'none';
+                        this.titleBookMessage = ''
+                      },
+                      deleteMessage:function(message){
+
+                        //ลบข้อมูล
+                        messageRef.child(message.id).remove();
+
+                        //ลบรูปใน Firebase Storage
+                        // Create a reference to the file to delete
+                        // Create a reference to the file to delete
+                        var desertRef = firebase.storage().refFromURL(message.img)
+
+                        // Delete the file
+                        desertRef.delete().then(function() {
+                          // File deleted successfully
+                          console.log('File deleted successfully.')
+                        }).catch(function(error) {
+                          // Uh-oh, an error occurred!
+                          console.log(error)
+                        });
+
+                      },
+                      deleteBook:function(messageTitle){
+                        //ลบข้อมูลหนังสือ
+                        messageRefTitle.child(messageTitle.id).remove();
+                        // messageRef.child($key+'/'+messageTitle.TitleBook).remove();
+
+
+                        // messageRef.child('book/'+messageTitle.TitleBook).remove();
+                      },
+                      editMessage:function(message){
+                        //แก้ไขข้อมูล
+                        this.editText = message
+                        this.messageText = message.text
+                        this.checkedPrivate = message.checkedPrivate
+                      },
+                      cancelMessage:function(){
+                        //ยกเลิก
+                        this.editText = null
+                        this.messageText=''
+                        this.checkedPriveORPublic = null
+                        this.checkedPrivate = this.checkedPrivate
+                        this.checkFollowToggle = this.checkFollowToggle
+                      },
+                      followBook:function(message){
+                        if(message.follow == 1){
+                          this.checkFollowToggle = 0
+                          messageRef.child(message.id).update({follow:this.checkFollowToggle})
+                          // console.log('true')
+                        }
+                        if(message.follow == 0){
+                          this.checkFollowToggle = 1
+                          messageRef.child(message.id).update({follow:this.checkFollowToggle})
+                          // console.log('false')
+                        }
+                        this.cancelMessage()
+                        // console.log(this.checkFollowToggle)
+                        message.follow = this.checkFollowToggle
+                      },
+                      updateMessage:function(){
+                          //อัพเดทข้อมูล
+                          messageRef.child(this.editText.id).update({text:this.messageText, checkedPrivate:this.checkedPrivate})
+                          this.cancelMessage()
+                      },
+                  },
+                  created(){
+                          //หลังเพิ่มข้อมูลเสร็จ เอาข้อมูลที่มีในฐานข้อมูลไปแสดง
+                          messageRef.on('child_added',snapshot=>{
+                              //message
+                              this.userName= '' //clear Data
+                              this.messageText= '' //clear Data
+                              this.messages.push({...snapshot.val(), id:snapshot.key})
+                          })
+                          //หลังเพิ่มข้อมูลเสร็จ เอาข้อมูลที่มีในฐานข้อมูลไปแสดง
+                          messageRefTitle.on('child_added',snapshot=>{
+                          //messagesTitle
+                          this.messagesTitle.push({...snapshot.val(), id:snapshot.key})
+                          })
+                          //หลังลบข้อมูลออกจากฐานข้อมูลจะให้เกิดอะไรขึ้น
+                          messageRef.on('child_removed',snapshot=>{
+                              //remove
+                              const deleteText = this.messages.find(message=>message.id == snapshot.key)
+                              const index = this.messages.indexOf(deleteText)
+                              this.messages.splice(index, 1)
+                          })
+                          //หลังลบหนังสือจะเกิดอะไรขึ้น
+                          messageRefTitle.on('child_removed',snapshot=>{
+                              //remove Book
+                              const deleteBook = this.messagesTitle.find(TestTitle=>TestTitle.id == snapshot.key)
+                              const index = this.messagesTitle.indexOf(deleteBook)
+                              this.messagesTitle.splice(index, 1)
+                          })
+                          //อัพเดทฐานข้อมูล
+                          messageRef.on('child_changed',snapshot=>{
+                              //remove
+                              const updateText = this.messages.find(message=>message.id == snapshot.key)
+                              updateText.text = snapshot.val().text
+                              updateText.checkedPrivate = snapshot.val().checkedPrivate
+                              updateText.follow = snapshot.val().checkFollowToggle
+                          })
+                    },
+                  beforeMount(){
+                    firebase.auth().onAuthStateChanged((user) => {
+                      if(user.email !== ''){
+                      this.userLog = user.email
+                      }
+                      // console.log(this.userLog);
+                    }); 
+                  }
+              })
+            // +++END Vue+++
+
+          
+          if (!emailVerified) {
+            document.getElementById('quickstart-verify-email').style.display = 'inline';
+
+            document.getElementById('comment').style.display = 'none';
+
+            // document.getElementById('quickstart-verify-email').disabled = false;
+          }
+          // [END_EXCLUDE]
+        } else {
+          // User is signed out.
+          // [START_EXCLUDE]
+
+          document.getElementById('quickstart-verify-email').style.display = 'none';
+
+          // document.getElementById('quickstart-sign-in-status').textContent = 'Signed out';
+          document.getElementById('quickstart-sign-in').textContent = 'เข้าสู่ระบบ';
+          // document.getElementById('quickstart-account-details').textContent = 'null';
+          // [END_EXCLUDE]
+        }
+        // [START_EXCLUDE silent]
+        // document.getElementById('quickstart-sign-in').disabled = false;
+        // [END_EXCLUDE]
+      });
+      // [END authstatelistener]
+      document.getElementById('quickstart-sign-in').addEventListener('click', toggleSignIn, false);
+      document.getElementById('quickstart-sign-up').addEventListener('click', registerModal, false);
+      // document.getElementById('quickstart-verify-email').addEventListener('click', sendEmailVerification, false);
+      // document.getElementById('quickstart-password-reset').addEventListener('click', sendPasswordReset, false);
+
+    }
+
+    // function registerModal(){
+    //   var email = document.getElementById("email").value;
+    //   var password = document.getElementById("password").value;
+    //   firebase.auth().createUserWithEmailAndPassword(email, password).catch(function(error) {
+    //     // Handle Errors here.
+    //     var errorCode = error.code;
+    //     var errorMessage = error.message;
+    //     // [START_EXCLUDE]
+    //     if (errorCode == 'auth/weak-password') {
+    //       alert('The password is too weak.');
+    //     } else {
+    //       alert(errorMessage);
+    //     }
+    //     console.log(error);
+    //     // [END_EXCLUDE]
+    //   });
+    // }
+
+    window.onload=function(){
+      initApp();
+    }
+
+    $('#resetPassword').on('shown.bs.modal', function () {
+      $('#resetPassword').trigger('focus')
+    })
+
+
+</script>
+
+  </body>
+</html>
